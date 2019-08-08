@@ -1,0 +1,24 @@
+# Access article by name(s)
+https://allthetropes.fandom.com/api/v1/Articles/Details?titles=Titanic
+
+# Access article simplified, by id
+https://allthetropes.fandom.com/api/v1/Articles/AsSimpleJson?id=170005
+
+---------- TODO -----------
+1. Implement seperate formulas for seperator detection (RegEx).
+2. Name lookup
+3. Print out omitted names/names that didn't work
+
+---------- Error Entries (will parse for now.) ----------
+
+Honor Before Reason - The fathers and husbands doing whatever it takes to let their wives and children live even if they themselves freeze and drown, which also happened in Real Life.
+
+It's All Junk The "Heart of the Ocean" now really is the heart of the ocean.
+
+---------- Name Conversion ----------
+Zorro: Generation Z -> Zorro:_Generation_Z | spaces are underscores
+Working!! -> Working | exclamations removed 
+Steins;Gate -> Steins;Gate | no character encoding required
+steins;gate -> NA | 
+Steins%3BGate | encoded urls are good
+Monster's, Inc. -> NA | All commas result in split title queries in titles. Their wikia uses 'Monsters' in that case, so manual renaming... 
