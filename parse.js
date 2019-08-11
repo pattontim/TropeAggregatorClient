@@ -1,5 +1,5 @@
 
-const fetch = require("node-fetch");
+// const fetch = require("node-fetch");
 // returns a key and value pair
 // function getTropes(title){
 //     // perform requests with title
@@ -14,9 +14,11 @@ const fetch = require("node-fetch");
 //     return getTropesById(id)
 // }
 
-async function idsFromTitles(titles){
+async function idsFromTitles(title_string){
     // convert title array to CSV
-    csv_titles = titles.join(",")
+
+    // FIXME convert to arary
+    let csv_titles = title_string
     // now, throw away our csv titles and make a dict with each item's id as key and title as value.
     return fetch("https://allthetropes.fandom.com/api/v1/Articles/Details?titles=" + csv_titles)
     .then(function(response) {
@@ -25,7 +27,7 @@ async function idsFromTitles(titles){
     .then(function(data) {
         // console.log(JSON.stringify(myJson));
         
-        pairs = {}
+        let pairs = {}
         // if(Object.keys(data.items)[0] == undefined){
             //         return
             // }
@@ -48,54 +50,50 @@ async function getTropesById(id, callback){
     // let request = new Request('https://allthetropes.fandom.com/api/v1/Articles/AsSimpleJson?id=' + 
     let request = "https://allthetropes.fandom.com/api/v1/Articles/AsSimpleJson?id=" + id
 
-    data = undefined
+    let data = undefined
 
-    return fetch(request)
+    return fetch(request, {mode:'no-cors'})
         .then(response => response.json())
         .then(data => {
             // if (response.status === 200) {
                 // response.json().then(data => {
 // 
                 // });
-                let trope_group = {}
-
-
-                // for (const section of data.sections) {
-
-                // }
-
-                trope_group[data.sections[0].title] = []
-                data.sections[0].content.forEach(content => {
-                    if(content.type == 'list'){
-                        // console.log(content.elements)
-                        content.elements.forEach(trope_text => {
-                            let re = new RegExp('(^.+?):(?:.+)|(.+)', 'gm')
-                            let match = re.exec(trope_text.text)
-                            // console.log(trope_text.text.match(re))
-                            if(match != null){
-                                // console.log(match.length);
-                                // if(match.length == 1)
-                                if(match[1] != undefined){
-                                    if(match[0].length < match[1].length)
-                                        // console.log(match[0].replace(':', ''))
-                                        // tropes.push(match[0].replace(':', ''))
-                                        trope_group[data.sections[0].title].push(match[0].replace(':', ''))
-                                        // trope_group.tropes.push(match[0].replace(':', ''))
-                                    else
-                                        // console.log(match[1].replace(':', ''))
-                                        trope_group[data.sections[0].title].push(match[1].replace(':', ''))
-                                } else {
-                                    // console.log(match[0].replace(':',''));
-                                    trope_group[data.sections[0].title].push(match[0].replace(':',''))
+                let trope_group = []
+                for (const section of data.sections) {
+                // trope_group[data.sections[0].title] = []
+                    section.content.forEach(content => {
+                        if(content.type == 'list'){
+                            // console.log(content.elements)
+                            content.elements.forEach(trope_text => {
+                                let re = new RegExp('(^.+?):(?:.+)|(.+)', 'gm')
+                                let match = re.exec(trope_text.text)
+                                // console.log(trope_text.text.match(re))
+                                if(match != null){
+                                    // console.log(match.length);
+                                    // if(match.length == 1)
+                                    if(match[1] != undefined){
+                                        if(match[0].length < match[1].length)
+                                            // console.log(match[0].replace(':', ''))
+                                            // tropes.push(match[0].replace(':', ''))
+                                            trope_group.push(match[0].replace(':', ''))
+                                            // trope_group.tropes.push(match[0].replace(':', ''))
+                                        else
+                                            // console.log(match[1].replace(':', ''))
+                                            trope_group.push(match[1].replace(':', ''))
+                                    } else {
+                                        // console.log(match[0].replace(':',''));
+                                        trope_group.push(match[0].replace(':',''))
+                                    }
+                                                                    // else if(match.length == 2)
                                 }
-                                                                // else if(match.length == 2)
-                            }
-                        });
-                        // extract the tropes!
-                        // match a regex and filter out info. Always get start of 'text' field and go until either : or end of line that is also end of string
-                        // content.elements.forEach()
-                    }
-                });
+                            });
+                            // extract the tropes!
+                            // match a regex and filter out info. Always get start of 'text' field and go until either : or end of line that is also end of string
+                            // content.elements.forEach()
+                        }
+                    });
+                }
 
                 // trope group is defined by ID
                 // if (Object.keys(trope_group).length == 0) {
@@ -132,14 +130,14 @@ async function tropesFromIds(id_title_pairs){
 
 // Returns the 
 async function getMatches(titles){
-    trope_dict = await tropesFromIds(titles)
-    trope_counter = {}
+    let trope_dict = await tropesFromIds(titles)
+    let trope_counter = {}
 
     // use an array with 
     for (const title in trope_dict) {
         if (trope_dict.hasOwnProperty(title)) {
             const tropes_for_title = trope_dict[title];
-            tropes_for_title[title].forEach(trope => {
+            tropes_for_title.forEach(trope => {
                 if(trope_counter[trope] != undefined){
                     trope_counter[trope] += 1
                 } else {
@@ -176,18 +174,20 @@ async function getMatches(titles){
 // for each TROPE (with trope as key), have a list of movie titles that contain that trope
 // how would it fit in for other features, like
 // movies which appear most: easy
-// movies which appear sometimes: ;
-(async() => {
-    try {
-    ids = await idsFromTitles(["Invader_Zim", "Tengen_Toppa_Gurren_Lagann"])
-        console.log(ids)
-        trope_count = await getMatches(ids)
-        console.log(trope_count)
-        // matches = getMatches(ids)
-    } catch (e) {
-        console.log('Error occured ', e)
-    }
-})(); 
+// // movies which appear sometimes: ;
+// (async() => {
+//     try {
+//         let ids = await idsFromTitles(["Titanic", "ICarly"])
+//         console.log(ids)
+//         let trope_count = await getMatches(ids)
+//         console.log(trope_count)
+//         // matches = getMatches(ids)
+//     } catch (e) {
+//         console.log('Error occured ', e)
+//     }
+// })(); 
     
+export const getMatches_f = getMatches;
+export const idsFromTitles_f = idsFromTitles;
 
 // getMatches(idsFromTitles(['Titanic', 'Juno'], tropesFromIds))
