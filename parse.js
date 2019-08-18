@@ -1,26 +1,11 @@
 
-// const fetch = require("node-fetch");
-// returns a key and value pair
-// function getTropes(title){
-//     // perform requests with title
-//     let request = new Request('https://allthetropes.fandom.com/api/v1/Articles/Details?titles=title')
-
-//     data = undefined
-
-//     if(Object.keys(data.items)[0] == undefined){
-//         return
-//     }
-//     id = Number.parseInt(Object.keys(data.items)[0])
-//     return getTropesById(id)
-// }
-
 async function idsFromTitles(title_string){
     // convert title array to CSV
 
     // FIXME convert to arary
-    let csv_titles = title_string
+    let csv_titles = title_string.replace(/\ /g,'_')
     // now, throw away our csv titles and make a dict with each item's id as key and title as value.
-    return fetch("https://allthetropes.fandom.com/api/v1/Articles/Details?titles=" + csv_titles)
+    return fetch("https://api.allorigins.win/raw?url=https://allthetropes.fandom.com/api/v1/Articles/Details?titles=" + csv_titles)
     .then(function(response) {
         return response.json();
     })
@@ -45,20 +30,45 @@ async function idsFromTitles(title_string){
     // id = Number.parseInt(Object.keys(data.items)[0])
 }
 
-
 async function getTropesById(id, callback){
     // let request = new Request('https://allthetropes.fandom.com/api/v1/Articles/AsSimpleJson?id=' + 
-    let request = "https://allthetropes.fandom.com/api/v1/Articles/AsSimpleJson?id=" + id
+    let request = "https://api.allorigins.win/raw?url=https://allthetropes.fandom.com/api/v1/Articles/AsSimpleJson?id=" + id
 
     let data = undefined
 
-    return fetch(request, {mode:'no-cors'})
+    return fetch(request)
         .then(response => response.json())
+        .then(data => {
+            let cutdex = 0
+            // if(cutdex = JSON.stringify(data).indexOf('REDIRECT') != -1){
+            let clip_regex = /\"text\":\"REDIRECT\ (.*)",/g
+            let reg_res = clip_regex.exec(JSON.stringify(data))
+            if(reg_res != undefined){
+                // convert title to ID and restart query.
+                console.log("Cutting text, redirect detected! Text: ", reg_res[1])
+                // ids = await idsFromTitles(reg_res[1])
+                return idsFromTitles(reg_res[1])
+                .then(ids => {
+                   return Object.keys(ids)[0]
+                }).then(id => {
+                    let request =  "https://api.allorigins.win/raw?url=https://allthetropes.fandom.com/api/v1/Articles/AsSimpleJson?id=" + id
+                    return fetch(request)
+                    .then(response => {return response.json()})
+                });
+                // ids_promise.then(function(ids){
+                    // return getTropesById(ids[0])
+                // })
+                // return getTropesById(ids[0])
+            } else {
+                return data
+            }
+        })
         .then(data => {
             // if (response.status === 200) {
                 // response.json().then(data => {
 // 
                 // });
+                
                 let trope_group = []
                 for (const section of data.sections) {
                 // trope_group[data.sections[0].title] = []
@@ -129,8 +139,9 @@ async function tropesFromIds(id_title_pairs){
 }
 
 // Returns the 
-async function getMatches(titles){
-    let trope_dict = await tropesFromIds(titles)
+async function getMatches(title_id_pairs){
+    // TODO follow redirects OR get by name!
+    let trope_dict = await tropesFromIds(title_id_pairs)
     let trope_counter = {}
 
     // use an array with 
@@ -170,24 +181,6 @@ async function getMatches(titles){
     // for each tropedict entry,
         // increment dictionary entry with the trope as the key (literally as key)
 }
-
-// for each TROPE (with trope as key), have a list of movie titles that contain that trope
-// how would it fit in for other features, like
-// movies which appear most: easy
-// // movies which appear sometimes: ;
-// (async() => {
-//     try {
-//         let ids = await idsFromTitles(["Titanic", "ICarly"])
-//         console.log(ids)
-//         let trope_count = await getMatches(ids)
-//         console.log(trope_count)
-//         // matches = getMatches(ids)
-//     } catch (e) {
-//         console.log('Error occured ', e)
-//     }
-// })(); 
     
 export const getMatches_f = getMatches;
 export const idsFromTitles_f = idsFromTitles;
-
-// getMatches(idsFromTitles(['Titanic', 'Juno'], tropesFromIds))

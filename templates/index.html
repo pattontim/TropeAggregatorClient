@@ -42,12 +42,12 @@
 
 .default-grey-da7cb902-89c6-46fe-b0e7-d3b35aaf237a { background-color: rgba(119, 119, 119, 0.8); color: rgb(255, 255, 255); box-shadow: rgb(119, 119, 119) 0px 0px 12px; } -->
 
-</style><style type="text/css" data-asas-style="">body, div, a, p, span{ user-select: text !important; }p, h1, h2, h3, h4, h5, h6{ cursor: auto; user-select: text !important; }::selection{ background-color: #338FFF !important; color: #fff !important; }</style></head>
+<!-- </style><style type="text/css" data-asas-style="">body, div, a, p, span{ user-select: text !important; }p, h1, h2, h3, h4, h5, h6{ cursor: auto; user-select: text !important; }::selection{ background-color: #338FFF !important; color: #fff !important; }</style></head> -->
 
   <body style="">
 
     <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
-      <a class="navbar-brand" href="https://getbootstrap.com/docs/4.0/examples/starter-template/#">Navbar</a>
+      <a class="navbar-brand" href="https://getbootstrap.com/docs/4.0/examples/starter-template/#">Trope Aggregator</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -57,7 +57,7 @@
           <li class="nav-item active">
             <a class="nav-link" href="https://getbootstrap.com/docs/4.0/examples/starter-template/#">Home <span class="sr-only">(current)</span></a>
           </li>
-          <li class="nav-item">
+          <!-- <li class="nav-item">
             <a class="nav-link" href="https://getbootstrap.com/docs/4.0/examples/starter-template/#">Link</a>
           </li>
           <li class="nav-item">
@@ -69,8 +69,8 @@
               <a class="dropdown-item" href="https://getbootstrap.com/docs/4.0/examples/starter-template/#">Action</a>
               <a class="dropdown-item" href="https://getbootstrap.com/docs/4.0/examples/starter-template/#">Another action</a>
               <a class="dropdown-item" href="https://getbootstrap.com/docs/4.0/examples/starter-template/#">Something else here</a>
-            </div>
-          </li>-vo=
+            </div> -->
+          <!-- </li>-vo= -->
         </ul>
         <form class="form-inline my-2 my-lg-0">
           <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search">
@@ -81,25 +81,31 @@
 
     <main role="main" class="container">
 
-      <div class="starter-template">
-          <!-- <textarea id="stop_1_input"></textarea> -->
-          <!-- <textarea id="stop_2_input"></textarea> -->
-          <!-- <button class="btn" id="submit_button">Submit</button> -->
-          <fieldset>
+      <!-- <div class="starter-template"> -->
     <legend>Example legend</legend>
-    <p>
-        <label for="movies_input">Movie Titles</label>
+    <div class="row mt-2">
+        <label class="mt-2 mr-2" for="movies_input">Movie Titles</label>
         <input type="text" id="movies_input" placeholder="Movie Title">
-    </p>
-
-    <div class="row">
-      <button class="btn" id="count_btn">Count Tropes</button>
+        <button class="btn btn-primary" id="count_btn">Count Tropes</button>
     </div>
-    <textarea class="" id="response_area"></textarea>
-    <div class="row">
-      <button class="btn" id="movie_count_btn">Find Movie by Match</button>
-      <button class="btn" id="movie_embody_btn">Find Movie that Encompasses</button>
+    <!-- <div class="row"> -->
+    <!-- </div> -->
+    <div class="row"></div>
+    <div class="container">
+      <div class="row">
+        <form role = "form">
+          <div class = "form-group">
+              <label for = "name">Trope Results</label>
+              <textarea style="min-width: 100%" cols=500 id="response_area" class="form-control" rows = "15" placeholder = "Trope Results"></textarea>
+          </div>
+        </form>
+        <div class="col-lg-12">
+          <button class="btn btn-primary" id="movie_count_btn">Find Movie by Match</button>
+          <button class="btn btn-primary" id="movie_embody_btn">Find Movie that Encompasses</button>
+        </div>
+      </div>
     </div>
+    </main>
 
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"
   integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
@@ -111,20 +117,62 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.15.0/popper.min.js"></script>
 
     <!-- socketio stuff -->
-    <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
-    <script type="text/javascript" charset="utf-8">
+    <!-- <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script> -->
+    <script type="module" charset="utf-8">
+    // import { getMatches, idsFromTitles } from "../parse.js";
+    import * as trope_api from "../parse.js"
+    // let trope_mod = require('../parse.js')
 
-    function handleCountBtn(){
-      titles = document.getElementById('movies_input')
-      document.getElementById('response_area').value = function(){}
-      getMatches(titles)
+    window.onload = function () {
+      function handleCountBtn(){
+        let title_string = document.getElementById('movies_input').value
+        // let titles = $('#movies_input')[0].value
+        // let titles = $('movies_input')
+        // let titles = document.getElementByID('movies_input')
+        console.log(title_string);
+        // ids = getMatches(titles)
+        (async() => {
+          try {
+            let ids = await trope_api.idsFromTitles_f(title_string)
+            console.log(ids)
+            let trope_count = await trope_api.getMatches_f(ids)
+            console.log(trope_count)
+            // matches = getMatches(ids)
+            document.getElementById('response_area').value = ''
+            // for (const key in trope_count) {
+            //   if (trope_count.hasOwnProperty(key)) {
+            //     // const trope = trope_count[key];
+            //     document.getElementById('response_area').value += key + '\n'
+            //   }
+            // 
+            let output_arr = Object.entries(trope_count)
+            output_arr.sort(function(a,b){
+              return a[1] - b[1]
+            })
+            output_arr.reverse()
+            
+            let pretty_output = ""
+            output_arr.forEach(pair => {
+              pretty_output += pair[0] + ': ' + pair[1] + '\n'
+            });
+            document.getElementById('response_area').value = pretty_output
+
+            // let output_arr = JSON.stringify(trope_count).split(',')
+            // output_arr.forEach(pair => {
+              // document.getElementById('response_area').value += pair + '\n'
+            // });
+            // document.getElementById('response_area').value = JSON.stringify(trope_count)
+          } catch (e) {
+            console.log('Error occured ', e)
+          }
+        })();
+      }
+      
+      $('#count_btn').on('click', function(){
+        handleCountBtn()
+      })
     }
-
-    $('#count_btn').on('click', function(){
-      handleCountBtn()
-    })
-    </script>
-  
+      </script>
   </body>
 
 <!-- <iframe frameborder="0" scrolling="no" style="background-color: transparent; border: 0px; display: none;" src="./index_files/saved_resource.html"></iframe><div id="GOOGLE_INPUT_CHEXT_FLAG" style="display: none;" input="" input_stat="{&quot;tlang&quot;:true,&quot;tsbc&quot;:true,&quot;pun&quot;:true,&quot;mk&quot;:true,&quot;ss&quot;:true}"></div></body><auto-scroll></auto-scroll></html> -->

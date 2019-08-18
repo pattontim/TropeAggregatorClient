@@ -22,3 +22,14 @@ Steins;Gate -> Steins;Gate | no character encoding required
 steins;gate -> NA | 
 Steins%3BGate | encoded urls are good
 Monster's, Inc. -> NA | All commas result in split title queries in titles. Their wikia uses 'Monsters' in that case, so manual renaming... 
+
+---------- Trope Conversion Error ----------
+WALL-E: -- trope seperator
+ICarly: Seperate pages for tropes
+Madoka Magica: Multiline because of colon before list, commas can't go in keys (blonde). 
+K-On!: -- trope seperator
+Guardians of the Galaxy: - points are treated as tropes!
+The_Lord_of_the_rings: Provides Examples Of
+"Il buono, il brutto, il cattivo": Add support for quoting with "".
+La vita è bella: 
+Spirited Away (Japanese name): As above, search some kind of DB as backup and look for English name and alternative names.
